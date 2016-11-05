@@ -1,0 +1,5 @@
+---
+M2_HOME: /opt/maven
+
+MAVEN_USER: maven
+MAVEN_GROUP: jenkins  #on purpose only for jenkins

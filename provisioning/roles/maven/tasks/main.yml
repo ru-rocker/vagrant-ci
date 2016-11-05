@@ -1,0 +1,27 @@
+---
+- name: install unzip
+  yum: name=unzip state=present
+
+# - name: download maven
+#   get_url:
+#     url: https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip
+#     dest: /tmp
+#     checksum: "md5:6e5da03a3324f616493a0fd09d6383fc"
+
+- name: Extract archive
+  command: chdir=/opt /usr/bin/unzip -oq /tmp/apache-maven-3.3.3-bin.zip creates={{ M2_HOME }}
+
+- name: Rename install directory
+  command: chdir=/opt /bin/mv apache-maven-3.3.3 maven creates={{ M2_HOME }}
+
+- name: Add group for maven
+  group: name={{ MAVEN_USER }} state=present
+
+- name: Add user for maven
+  user: name={{ MAVEN_USER }} group={{ MAVEN_GROUP }} home={{ M2_HOME }} state=present
+
+- name: Change ownership of maven installation
+  file: path={{ M2_HOME }} owner={{ MAVEN_USER }} group={{ MAVEN_GROUP }} state=directory recurse=yes
+
+- name: Set M2_HOME into profile.d
+  template: src=maven.sh.j2 dest=/etc/profile.d/maven.sh mode=a+x

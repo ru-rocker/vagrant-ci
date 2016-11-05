@@ -1,0 +1,9 @@
+---
+jboss_user: jboss
+jboss_group: jboss
+jboss_home: /opt/wildfly
+jboss_bind_address_management: 0.0.0.0
+jboss_bind_address: 0.0.0.0
+
+jboss_management_user: wildfly
+jboss_management_password: password

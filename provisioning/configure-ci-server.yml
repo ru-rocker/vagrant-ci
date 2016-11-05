@@ -1,0 +1,11 @@
+---
+- name: Configure CI server
+  hosts: ci-server
+  become: yes
+  roles:
+    #- ansiblesetup
+    #- git
+    #- williamyeh.oracle-java
+    #- geerlingguy.jenkins
+    #- wildfly
+    - maven

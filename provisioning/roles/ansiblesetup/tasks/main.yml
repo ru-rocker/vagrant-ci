@@ -1,0 +1,12 @@
+---
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: present
+  become: yes
+
+- name: install ansible
+  yum:
+    name: ansible
+    state: present
+  become: yes

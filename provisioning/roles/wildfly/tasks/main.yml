@@ -1,0 +1,39 @@
+---
+- name: install unzip
+  yum: name=unzip state=present
+
+# - name: download wildfy
+#   get_url:
+#     url: http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip
+#     dest: /tmp
+#     checksum: "md5:a7ff356fd3333529426e98937d8760cf"
+#   register: get_wildfly
+#
+# - debug: var=get_wildfly
+
+- name: Extract archive
+  command: chdir=/opt /usr/bin/unzip -oq /tmp/wildfly-10.1.0.Final.zip creates={{ jboss_home }}
+
+- name: Rename install directory
+  command: chdir=/opt /bin/mv wildfly-10.1.0.Final wildfly creates={{ jboss_home }}
+
+- name: Add group "jboss"
+  group: name={{ jboss_user }} state=present
+
+- name: Add user "jboss"
+  user: name={{ jboss_user }} group={{ jboss_group }} home={{ jboss_home }} state=present
+
+- name: Copy domain.conf
+  template: src=domain.conf.j2 dest={{ jboss_home }}/bin/domain.conf
+
+- name: Change ownership of WildFly installation
+  file: path={{ jboss_home }} owner={{ jboss_user }} group={{ jboss_group }} state=directory recurse=yes
+
+- name: set management user
+  command: "{{ jboss_home }}/bin/add-user.sh {{ jboss_management_user }} {{ jboss_management_password }}"
+
+- name: Copy the init script
+  template: src=jboss-wildfly10.j2 dest=/etc/init.d/wildfly mode=0755
+
+- name: Enable WildFly to be started at boot
+  service: name=wildfly enabled=yes state=started
