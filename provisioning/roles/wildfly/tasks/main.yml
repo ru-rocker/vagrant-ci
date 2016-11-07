@@ -2,14 +2,14 @@
 - name: install unzip
   yum: name=unzip state=present
 
-# - name: download wildfy
-#   get_url:
-#     url: http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip
-#     dest: /tmp
-#     checksum: "md5:a7ff356fd3333529426e98937d8760cf"
-#   register: get_wildfly
-#
-# - debug: var=get_wildfly
+- name: download wildfy
+  get_url:
+    url: http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip
+    dest: /tmp
+    checksum: "md5:a7ff356fd3333529426e98937d8760cf"
+  register: get_wildfly
+
+- debug: var=get_wildfly
 
 - name: Extract archive
   command: chdir=/opt /usr/bin/unzip -oq /tmp/wildfly-10.1.0.Final.zip creates={{ jboss_home }}

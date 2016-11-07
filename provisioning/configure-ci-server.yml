@@ -3,9 +3,9 @@
   hosts: ci-server
   become: yes
   roles:
-    #- ansiblesetup
-    #- git
-    #- williamyeh.oracle-java
-    #- geerlingguy.jenkins
-    #- wildfly
+    - ansiblesetup
+    - git
+    - williamyeh.oracle-java
+    - geerlingguy.jenkins
+    - wildfly
     - maven
