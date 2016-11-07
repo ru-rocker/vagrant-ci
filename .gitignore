@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/java,maven,osx,eclipse
 
+### Ansible ###
+*.retry
+
 ### Vagrant ###
 .vagrant/
 

@@ -35,8 +35,8 @@
 - name: set internal vars for 1.8.0_111
   set_fact:
     jdk_version_detail: "{{ java_version }}u{{ java_subversion }}-b14"
-    jdk_rpm_checksum: "md5: 27504fb3cbbdaa44945572583663dacd"
-    jdk_targz_checksum: "md5: 2d48badebe05c848cc3b4d6e0c53a457"
+    jdk_rpm_checksum: "md5:27504fb3cbbdaa44945572583663dacd"
+    jdk_targz_checksum: "md5:2d48badebe05c848cc3b4d6e0c53a457"
   when: java_version == 8 and java_subversion == 111
 
 - name: set internal vars for 1.8.0_101
