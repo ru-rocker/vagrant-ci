@@ -10,7 +10,7 @@ jenkins_home: /var/lib/jenkins
 jenkins_hostname: localhost
 jenkins_http_port: 8100
 jenkins_jar_location: /opt/jenkins-cli.jar
-jenkins_plugins: [ansible,cobertura]
+jenkins_plugins: [ansible,cobertura,git,git-client,github]
 jenkins_url_prefix: ""
 jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
 
