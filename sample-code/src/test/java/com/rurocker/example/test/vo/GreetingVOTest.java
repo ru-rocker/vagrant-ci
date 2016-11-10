@@ -19,5 +19,12 @@ public class GreetingVOTest {
 		Greeting greeting = new Greeting(d, content);
 		Assert.assertEquals(d, greeting.getDate());
 		Assert.assertEquals(content, greeting.getContent());
+		
+		Date d2 = new Date();
+		String newContent = "John";
+		greeting.setDate(d2);
+		greeting.setContent(newContent);
+		Assert.assertEquals(d2, greeting.getDate());
+		Assert.assertEquals(newContent, greeting.getContent());
 	}
 }
