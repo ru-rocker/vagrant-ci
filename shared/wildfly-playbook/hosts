@@ -1,0 +1,3 @@
+[wildfly]
+#add variable ansible_connection=local in order not to try to use SSH to contact the hosts.
+localhost ansible_connection=local

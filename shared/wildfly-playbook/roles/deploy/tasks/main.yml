@@ -1,0 +1,60 @@
+---
+- name: Server group
+  jcli_servergroup:
+    jboss_home: "{{ WILDFLY_HOME }}"
+    server_group_name: "{{ SERVER_GROUP }}"
+    user: "{{ USER }}"
+    password: "{{ PASSWD }}"
+    state: present
+  register: hasil
+  tags: init
+
+- debug: var=hasil
+
+- name: Server
+  jcli_server:
+    jboss_home: "{{ WILDFLY_HOME }}"
+    host: "{{ HOST }}"
+    server_group_name: "{{ SERVER_GROUP }}"
+    server_config_name: "{{ SERVER_CONFIG }}"
+    server_socket_binding_port_offset: "{{ PORT_OFFSET }}"
+    user: "{{ USER }}"
+    password: "{{ PASSWD }}"
+    state: present
+  register: hasil
+  tags: init
+
+- debug: var=hasil
+
+- name: JVM
+  jcli_jvm:
+    jboss_home: "{{ WILDFLY_HOME }}"
+    host: "{{ HOST }}"
+    server_config_name: "{{ SERVER_CONFIG }}"
+    jvn_name: "{{ JVM_NAME }}"
+    heap_size: "{{ HEAP_SIZE }}"
+    max_heap_size: "{{ MAX_HEAP_SIZE }}"
+    permgen_size: "{{ PERMGEN_SIZE }}"
+    max_permgen_size: "{{ MAX_PERMGEN_SIZE }}"
+    user: "{{ USER }}"
+    password: "{{ PASSWD }}"
+    state: present
+  register: hasil
+  tags: init
+
+- debug: var=hasil
+
+- name: Deploy artifact
+  jcli_deploy:
+    jboss_home: "{{ WILDFLY_HOME }}"
+    server_group_name: "{{ SERVER_GROUP }}"
+    server_mode: domain
+    artifact: "{{ ARTIFACT_NAME }}"
+    artifact_dir: "{{ ARTIFACT_DIR }}"
+    user: "{{ USER }}"
+    password: "{{ PASSWD }}"
+    state: present
+  register: hasil
+  tags: deploy
+
+- debug: var=hasil

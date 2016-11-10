@@ -1,0 +1,17 @@
+---
+USER: wildfly
+PASSWD: password
+
+HOST: master
+SERVER_GROUP: group1
+SERVER_CONFIG: server1
+PORT_OFFSET: 5
+JVM_NAME: jvm_serv1
+HEAP_SIZE: 512m
+MAX_HEAP_SIZE: 1024m
+PERMGEN_SIZE: 512m
+MAX_PERMGEN_SIZE: 1024m
+
+WILDFLY_HOME: /opt/wildfly
+ARTIFACT_NAME: demo-0.0.1-SNAPSHOT.war
+ARTIFACT_DIR: /var/lib/jenkins/jobs/spring-rest/target/

@@ -1,0 +1,3 @@
+- hosts: wildfly
+  roles:
+    - deploy
