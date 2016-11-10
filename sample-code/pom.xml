@@ -54,50 +54,49 @@
 	<build>
 		<finalName>${project.name}-${project.version}</finalName>
 		<plugins>
-			<plugins>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>cobertura-maven-plugin</artifactId>
-					<version>2.7</version>
-					<configuration>
-						<formats>
-							<format>xml</format>
-						</formats>
-					</configuration>
-					<executions>
-						<execution>
-							<phase>package</phase>
-							<goals>
-								<goal>cobertura</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-war-plugin</artifactId>
-					<configuration>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-maven-plugin</artifactId>
-					<configuration>
-						<layout>WAR</layout>
-						<executable>true</executable>
-						<mainClass>com.rurocker.example.DemoApplication</mainClass>
-						<!-- Enable the line below to have remote debugging of your application 
-							on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
-					</configuration>
-					<executions>
-						<execution>
-							<goals>
-								<goal>repackage</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<formats>
+						<format>xml</format>
+					</formats>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>cobertura</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<layout>WAR</layout>
+					<executable>true</executable>
+					<mainClass>com.rurocker.example.DemoApplication</mainClass>
+					<!-- Enable the line below to have remote debugging of your application 
+						on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>
