@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+''' deploy gagal: WFLYDC0074'''
+
 from ansible.module_utils.basic import *
 import subprocess
 import json
@@ -39,10 +41,7 @@ def deployment_present(data):
         result,err = p.communicate()
         meta = {"status": "OK", "response": result}
     else:
-        if mode == 'standalone':
-            cli = "deploy %s/%s --force" % (data['artifact_dir'],data['artifact'])
-        else:
-            cli = "deploy %s/%s --server-groups=%s --force" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
+        cli = "deploy %s/%s --force" % (data['artifact_dir'],data['artifact']) #same behaviour between standalone and domain
 
         p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
 

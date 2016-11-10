@@ -14,4 +14,4 @@ MAX_PERMGEN_SIZE: 1024m
 
 WILDFLY_HOME: /opt/wildfly
 ARTIFACT_NAME: demo-0.0.1-SNAPSHOT.war
-ARTIFACT_DIR: /var/lib/jenkins/jobs/spring-rest/target/
+ARTIFACT_DIR: /to/be/set/on/jenkins
