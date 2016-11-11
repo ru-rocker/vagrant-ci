@@ -5,6 +5,7 @@ import subprocess
 import json
 
 def isServerGroupAlreadyCreated(data):
+
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
     cli = "/server-group=%s:query" % (data['server_group_name'])
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
@@ -13,16 +14,24 @@ def isServerGroupAlreadyCreated(data):
     p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
     result , err = p.communicate()
 
-    print(err)
+    created = False
+    remoteExists = False
 
     if "WFLYCTL0216" in result:
-        return False
+        created = False
     else:
-        return True
+        created = True
+
+    if "WFLYPRT0053" in result:
+        remoteExists = False
+    else:
+        remoteExists = True
+
+    return remoteExists, created
 
 def server_group_present(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
-    exists = isServerGroupAlreadyCreated(data)
+    exists, created = isServerGroupAlreadyCreated(data)
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
     user = "-u=%s" % (data['user'])
     password = "-p=%s" % (data['password'])
@@ -31,20 +40,26 @@ def server_group_present(data):
     meta = {}
 
     if not exists:
-        cli = "/server-group=%s:add(profile=%s, socket-binding-group=%s)" % (data['server_group_name'],data['server_group_profile'],data['socket_binding_group'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-        result,err = p.communicate()
-        meta = {"status": "OK", "response": result}
-    else:
+        mesg = "Could not connect http-remoting://%s:%s" % (data['controller_host'],data['controller_port'])
+        meta = {"status": "Error", "response": mesg}
+        isError = True
         hasChanged = False
-        resp = "Server group %s already created" % (data['server_group_name'])
-        meta = {"status" : "OK", "response" : resp}
+    else:
+        if not created:
+            cli = "/server-group=%s:add(profile=%s, socket-binding-group=%s)" % (data['server_group_name'],data['server_group_profile'],data['socket_binding_group'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
+            meta = {"status": "OK", "response": result}
+        else:
+            hasChanged = False
+            resp = "Server group %s already created" % (data['server_group_name'])
+            meta = {"status" : "OK", "response" : resp}
 
     return isError, hasChanged, meta
 
 def server_group_absent(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
-    exists = isServerGroupAlreadyCreated(data)
+    exists, created = isServerGroupAlreadyCreated(data)
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
     user = "-u=%s" % (data['user'])
     password = "-p=%s" % (data['password'])
@@ -53,14 +68,20 @@ def server_group_absent(data):
     meta = {}
 
     if not exists:
+        mesg = "Could not connect http-remoting://%s:%s" % (data['controller_host'],data['controller_port'])
+        meta = {"status": "Error", "response": mesg}
+        isError = True
         hasChanged = False
-        resp = "Server group %s does not exist" % (data['server_group_name'])
-        meta = {"status" : "OK", "response" : resp}
     else:
-        cli = "/server-group=%s:remove" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-        result,err = p.communicate()
-        meta = {"status": "OK", "response": result}
+        if not created:
+            hasChanged = False
+            resp = "Server group %s does not exist" % (data['server_group_name'])
+            meta = {"status" : "OK", "response" : resp}
+        else:
+            cli = "/server-group=%s:remove" % (data['server_group_name'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
+            meta = {"status": "OK", "response": result}
 
     return isError, hasChanged, meta
 
@@ -69,20 +90,26 @@ def server_group_start(data):
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
     user = "-u=%s" % (data['user'])
     password = "-p=%s" % (data['password'])
-    exists = isServerGroupAlreadyCreated(data)
+    exists, created = isServerGroupAlreadyCreated(data)
     isError = False
     hasChanged = True
     meta = {}
 
-    if exists:
-        cli = "/server-group=%s:start-servers" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-        result,err = p.communicate()
-        meta = {"status": "OK", "response": result}
-    else:
+    if not exists:
+        mesg = "Could not connect http-remoting://%s:%s" % (data['controller_host'],data['controller_port'])
+        meta = {"status": "Error", "response": mesg}
+        isError = True
         hasChanged = False
-        resp = "Server group %s does not exist" % (data['server_group_name'])
-        meta = {"status" : "OK", "response" : resp}
+    else:
+        if created:
+            cli = "/server-group=%s:start-servers" % (data['server_group_name'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
+            meta = {"status": "OK", "response": result}
+        else:
+            hasChanged = False
+            resp = "Server group %s does not exist" % (data['server_group_name'])
+            meta = {"status" : "OK", "response" : resp}
 
     return isError, hasChanged, meta
 
@@ -91,20 +118,26 @@ def server_group_stop(data):
     controller = "--controller=%s:%s" % (data['controller_host'],data['controller_port'])
     user = "-u=%s" % (data['user'])
     password = "-p=%s" % (data['password'])
-    exists = isServerGroupAlreadyCreated(data)
+    exists, created = isServerGroupAlreadyCreated(data)
     isError = False
     hasChanged = True
     meta = {}
 
-    if exists:
-        cli = "/server-group=%s:stop-servers" % (data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-        result,err = p.communicate()
-        meta = {"status": "OK", "response": result}
-    else:
+    if not exists:
+        mesg = "Could not connect http-remoting://%s:%s" % (data['controller_host'],data['controller_port'])
+        meta = {"status": "Error", "response": mesg}
+        isError = True
         hasChanged = False
-        resp = "Server group %s does not exist" % (data['server_group_name'])
-        meta = {"status" : "OK", "response" : resp}
+    else:
+        if created:
+            cli = "/server-group=%s:stop-servers" % (data['server_group_name'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
+            meta = {"status": "OK", "response": result}
+        else:
+            hasChanged = False
+            resp = "Server group %s does not exist" % (data['server_group_name'])
+            meta = {"status" : "OK", "response" : resp}
 
     return isError, hasChanged, meta
 

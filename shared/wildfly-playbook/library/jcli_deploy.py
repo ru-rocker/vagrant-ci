@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-''' deploy gagal: WFLYDC0074'''
-
 from ansible.module_utils.basic import *
 import subprocess
 import json
@@ -13,13 +11,22 @@ def isArtifactAlreadyDeployed(data):
     user = "-u=%s" % (data['user'])
     password = "-p=%s" % (data['password'])
     p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-    output = p.communicate()[0]
+    result = p.communicate()[0]
 
-    if "WFLYCTL0216" in output:
-        return False
+    created = False
+    remoteExists = False
+
+    if "WFLYCTL0216" in result:
+        created = False
     else:
-        return True
+        created = True
 
+    if "WFLYPRT0053" in result:
+        remoteExists = False
+    else:
+        remoteExists = True
+
+    return remoteExists, created
 
 def deployment_present(data):
     cmd = data['jboss_home'] + '/bin/jboss-cli.sh'
@@ -27,26 +34,35 @@ def deployment_present(data):
     user = "-u=%s" % (data['user'])
     password = "-p=%s" % (data['password'])
     mode = data['server_mode']
-    exists = isArtifactAlreadyDeployed(data)
+    exists, created = isArtifactAlreadyDeployed(data)
     isError = False
     hasChanged = True
     meta = {}
+    result = ""
 
     if not exists:
-        if mode == 'standalone':
-            cli = "deploy %s/%s" % (data['artifact_dir'],data['artifact'])
-        else:
-            cli = "deploy %s/%s --server-groups=%s" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-        result,err = p.communicate()
-        meta = {"status": "OK", "response": result}
+        mesg = "Could not connect http-remoting://%s:%s" % (data['controller_host'],data['controller_port'])
+        meta = {"status": "Error", "response": mesg}
+        isError = True
+        hasChanged = False
     else:
-        cli = "deploy %s/%s --force" % (data['artifact_dir'],data['artifact']) #same behaviour between standalone and domain
+        if not created:
+            if mode == 'standalone':
+                cli = "deploy %s/%s" % (data['artifact_dir'],data['artifact'])
+            else:
+                cli = "deploy %s/%s --server-groups=%s" % (data['artifact_dir'],data['artifact'],data['server_group_name'])
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
+        else:
+            cli = "deploy %s/%s --force" % (data['artifact_dir'],data['artifact']) #same behaviour between standalone and domain
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
 
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-
-        result,err = p.communicate()
-        meta = {"status" : "OK", "response" : result}
+        if "WFLYDC0074" in result:
+            meta = {"status" : "Failed to deploy", "response" : result}
+            isError = True
+        else:
+            meta = {"status" : "OK", "response" : result}
 
     return isError, hasChanged, meta
 
@@ -57,24 +73,35 @@ def deployment_absent(data):
     password = "-p=%s" % (data['password'])
 
     mode = data['server_mode']
-    exists = isArtifactAlreadyDeployed(data)
+    exists, created = isArtifactAlreadyDeployed(data)
     isError = False
     hasChanged = True
     meta = {}
 
     if not exists:
+        mesg = "Could not connect http-remoting://%s:%s" % (data['controller_host'],data['controller_port'])
+        meta = {"status": "Error", "response": mesg}
+        isError = True
         hasChanged = False
-        resp = "Deployment %s does not exist" % (data['artifact'])
-        meta = {"status" : "OK", "response" : resp}
     else:
-        if mode == 'standalone':
-            cli = "undeploy %s" % (data['artifact'])
+        if not created:
+            hasChanged = False
+            resp = "Deployment %s does not exist" % (data['artifact'])
+            meta = {"status" : "OK", "response" : resp}
         else:
-            cli = "undeploy %s --server-groups=%s" % (data['artifact'],data['server_group_name'])
+            if mode == 'standalone':
+                cli = "undeploy %s" % (data['artifact'])
+            else:
+                cli = "undeploy %s --server-groups=%s" % (data['artifact'],data['server_group_name'])
 
-        p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
-        result,err = p.communicate()
-        meta = {"status": "OK", "response": result}
+            p = subprocess.Popen(["sh", cmd, "-c", cli, controller, user, password], stdout=subprocess.PIPE)
+            result,err = p.communicate()
+
+            if "WFLYDC0074" in result:
+                meta = {"status" : "Failed to undeploy", "response" : result}
+                isError = True
+            else:
+                meta = {"status": "OK", "response": result}
 
     return isError, hasChanged, meta
 
