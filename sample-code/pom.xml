@@ -22,6 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<build.number>LOCAL</build.number>
 	</properties>
 
 	<dependencies>
@@ -76,6 +77,16 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
+					<manifest>
+						<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+					</manifest>
+					<archive>
+						<manifestEntries>
+							<Specification-Title>${project.name}</Specification-Title>
+							<Specification-Version>${project.version}</Specification-Version>
+							<Implementation-Version>${build.number}</Implementation-Version>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
