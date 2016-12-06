@@ -18,7 +18,7 @@ import com.rurocker.example.vo.Greeting;
 @RequestMapping("/api")
 public class GreetingController {
 
-	private static final String template = "Hello, %s?";
+	private static final String template = "Hello, %s";
 
 	@RequestMapping("/greeting")
 	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
