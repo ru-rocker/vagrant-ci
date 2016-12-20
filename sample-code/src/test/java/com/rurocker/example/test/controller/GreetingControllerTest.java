@@ -58,7 +58,7 @@ public class GreetingControllerTest {
 		mockMvc.perform(get("/api/greeting").contentType(contentType))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.date", notNullValue()))
-			.andExpect(jsonPath("$.content", is("Hello, World")));
+			.andExpect(jsonPath("$.content", is("Howdy, World")));
 		
 	}
 	
@@ -67,7 +67,7 @@ public class GreetingControllerTest {
 		mockMvc.perform(get("/api/greeting?name=Mezut").contentType(contentType))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.date", notNullValue()))
-		.andExpect(jsonPath("$.content", is("Hello, Mezut")));
+		.andExpect(jsonPath("$.content", is("Howdy, Mezut")));
 		
 	}
 }
